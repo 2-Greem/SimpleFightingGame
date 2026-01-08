@@ -144,7 +144,10 @@ class Fighter extends Sprite {
         this.attackBox.position.y = this.position.y + this.attackBox.offset.y;
         // c.fillRect(this.attackBox.position.x, this.attackBox.position.y, this.attackBox.width, this.attackBox.height);
 
-        this.position.x += this.velocity.x;
+        const x = this.position.x + this.velocity.x;
+        if (x > 0 && x < 924){ // Ensure you cant move off the screen
+            this.position.x += this.velocity.x;
+        }
         this.position.y += this.velocity.y;
         // Gravity
         if (this.position.y + this.height + this.velocity.y >= canvas.height - 96){
