@@ -86,6 +86,7 @@ class Fighter extends Sprite {
         this.framesHold = 5;
         this.isDead = false;
         this.sprites = sprites;
+        this.jumps = 2;
 
         for (const sprite in this.sprites){
             sprites[sprite].image = new Image();
@@ -127,6 +128,7 @@ class Fighter extends Sprite {
 
     takeHit(){
         this.health -= 20;
+        this.isAttacking = false; // Getting hit cancels an attack
         this.animationLock = false;
         if (this.health <= 0){
             this.switchSprite("death");
@@ -153,6 +155,7 @@ class Fighter extends Sprite {
         if (this.position.y + this.height + this.velocity.y >= canvas.height - 96){
             this.velocity.y = 0;
             this.position.y = 330;
+            this.jumps = 2;
         } else {
             this.velocity.y += gravity;
         }
