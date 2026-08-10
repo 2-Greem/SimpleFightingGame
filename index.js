@@ -52,7 +52,7 @@ const player = new Fighter({
             framesMax: 6,
         },
         takeHit: {
-            imageSrc: './img/Martial Hero/Sprites/Take hit.png',
+            imageSrc: './img/Martial Hero/Sprites/TakeHit.png',
             framesMax: 4,
         },
         death: {
@@ -100,7 +100,7 @@ const enemy = new Fighter({
                 framesMax: 4,
             },
             takeHit: {
-                imageSrc: './img/Martial Hero 2/Sprites/Take hit.png',
+                imageSrc: './img/Martial Hero 2/Sprites/TakeHit.png',
                 framesMax: 3,
             },
             death: {
