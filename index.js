@@ -8,7 +8,9 @@ canvas.height = 576;
 c.fillRect(0, 0, canvas.width, canvas.height)
 
 const gravity = 0.5;
-let timer = 60;
+const friction = 0.6;
+const timerMax = 60
+let timer = timerMax;
 let timerId;
 
 const background = new Sprite({
@@ -24,7 +26,7 @@ const shop = new Sprite({
 })
 
 const player = new Fighter({
-    position: { x: 0, y: 0 },
+    position: { x: 200, y: 100 },
     velocity: { x: 0, y: 0 },
     imageSrc: './img/Martial Hero/Sprites/Idle.png',
     framesMax: 8,
@@ -71,7 +73,7 @@ const player = new Fighter({
 });
 
 const enemy = new Fighter({
-        position: { x: 400, y: 100 },
+        position: { x: 800, y: 100 },
         velocity: { x: 0, y: 0 },
         imageSrc: './img/Martial Hero 2/Sprites/Idle.png',
         framesMax: 4,
@@ -134,7 +136,29 @@ const keys = {
 
 }
 
-decreaseTimer()
+function reset(){
+    // Player 1 Stat Reset
+    player.reset();
+    player.position = { x: 200, y: 100 };
+    player.velocity = { x: 0, y: 0 };
+    // Update P1 Health UI
+    gsap.to('#playerHealth', {
+            width: player.health + '%'
+        })
+    // Player 2 Stat Reset
+    enemy.reset();
+    enemy.position = { x: 800, y: 100 };
+    enemy.velocity = { x: 0, y: 0 };
+    // Update P2 Health UI
+    gsap.to('#enemyHealth', {
+            width: enemy.health + '%'
+        })
+    // Clear Winner Declaration
+    document.querySelector("#displayText").style.display = 'none';
+    // Restart Timer
+    timer = timerMax;
+    decreaseTimer()
+}
 
 // infinite loop
 function animate(){
@@ -148,7 +172,6 @@ function animate(){
     enemy.update();
 
     // Player button movement
-    player.velocity.x = 0;
     // player.image = player.sprites.idle.image;
     if (keys.a.pressed && player.lastKeyPressed == 'a'){
         player.velocity.x = -5;
@@ -165,7 +188,6 @@ function animate(){
         player.switchSprite("fall");
     }
     // Enemy button movement
-    enemy.velocity.x = 0;
     if (keys.ArrowLeft.pressed && enemy.lastKeyPressed == 'ArrowLeft'){
         enemy.velocity.x = -5;
         enemy.switchSprite("run");
@@ -222,16 +244,25 @@ function animate(){
 
     // end game based on health
     if (enemy.health <= 0 || player.health <= 0){
+        timer = 0; //FIX: Hacky Fix, move this somewhere more intuitive
         determineWinner({player: player, enemy: enemy, timerId: timerId})
     }
 }
 
+decreaseTimer()
 animate()
 
 // Pressed Keys Event Listeners
 
 window.addEventListener('keydown', (event) => {
-    if (!player.isDead){
+
+    // occurs regardless of player deaths
+    switch(event.key) {
+        case 'r':
+            reset();
+    }
+
+    if (!player.isDead && timer > 0){
         switch (event.key) {
             case 'd':
                 keys.d.pressed = true;
@@ -252,7 +283,7 @@ window.addEventListener('keydown', (event) => {
                 break;
         }
     }
-    if (!enemy.isDead){
+    if (!enemy.isDead && timer > 0){
         switch(event.key) {
             // Enemy Controls
             case 'ArrowRight':
@@ -293,3 +324,10 @@ window.addEventListener('keyup', (event) => {
             break
     }
 })
+
+// Removes the default page scrolling behaviour on the arrow keys
+window.addEventListener("keydown", function(e) {
+    if(["Space", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].indexOf(e.code) > -1) {
+        e.preventDefault();
+    }
+}, { passive: false });

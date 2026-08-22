@@ -7,77 +7,137 @@
         /* Padding is included in the edge calculations */
         * {
             box-sizing: border-box;
+        }
+
+        .page {
+            text-align: center;
+            background-image: url('./img/wallpaper.png');
+            background-repeat: no-repeat; 
+            background-size: cover; 
+        }
+
+        .game-wrapper {
+            text-align: center;
+            padding: 10px;
+            background-color:#453936;
+            display: inline-block;
+            padding: 10px;
+            min-height: 100vh;
+        }
+
+        .game-container {
+            position: relative; 
+            display: inline-block; 
             font-family: 'Press Start 2P', cursive;
         }
+
+        .info-container {
+            padding-top: 10px;
+            font-size: larger;
+            color:beige;
+        }
+
     </style>
 </head>
 <body>
-    <div style="position: relative; display: inline-block">
-        <!-- Smaller Red Container div -->
-        <div style="position: absolute; display: flex; width: 100%;align-items: center; padding: 20px;">
-            <!-- Player Health -->
-            <div style="
-                position: relative; 
-                width: 100%; 
-                display: flex; 
-                justify-content: flex-end;
-                border-top: 4px solid white;
-                border-bottom: 4px solid white;
-                border-left: 4px solid white;"
-            >
-                <div style="
-                    background-color: red; 
-                    height: 30px; 
-                    width: 100%"
-                ></div>
+    <!-- Main Box Containing Everything -->
+    <div class="page">
+        <div class="game-wrapper">
+            <div class="game-container">
+                <!-- Smaller Red Container div -->
+                <div style="position: absolute; display: flex; width: 100%;align-items: center; padding: 20px;">
+                    <!-- Player Health -->
+                    <div style="
+                        position: relative; 
+                        width: 100%; 
+                        display: flex; 
+                        justify-content: flex-end;
+                        border-top: 4px solid white;
+                        border-bottom: 4px solid white;
+                        border-left: 4px solid white;"
+                    >
+                        <div style="
+                            background-color: red; 
+                            height: 30px; 
+                            width: 100%"
+                        ></div>
+                        <div 
+                            id="playerHealth" 
+                            style="position: absolute; background: #818cf8; top: 0; right: 0; bottom: 0; width: 100%;"
+                        ></div>
+                    </div>
+                    <!-- Timer -->
+                    <div 
+                        id="timer"
+                        style="background-color: black; 
+                        height: 50px; 
+                        width: 100px; 
+                        flex-shrink: 0;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        color: white;
+                        border: 4px solid white;"
+                    >10</div>
+                    <!-- Enemy Health -->
+                    <div style="
+                        position: relative; 
+                        width: 100%;
+                        border-top: 4px solid white;
+                        border-bottom: 4px solid white;
+                        border-right: 4px solid white;"
+                    >
+                        <div style="background-color: red; height: 30px"></div>
+                        <div 
+                            id="enemyHealth" 
+                            style="position: absolute; background: #818cf8; top: 0; right: 0; bottom: 0; left: 0;"
+                        ></div>
+                    </div>            
+                </div>
                 <div 
-                    id="playerHealth" 
-                    style="position: absolute; background: #818cf8; top: 0; right: 0; bottom: 0; width: 100%;"
-                ></div>
+                    id="displayText"
+                    style="
+                        position: absolute; 
+                        color: white; 
+                        display: none;
+                        align-items: center;
+                        justify-content: center;
+                        top: 0;
+                        right: 0;
+                        bottom: 0;          
+                        left: 0;"
+                >Tie</div>
+                <canvas></canvas>
             </div>
-            <!-- Timer -->
-            <div 
-                id="timer"
-                style="background-color: black; 
-                height: 50px; 
-                width: 100px; 
-                flex-shrink: 0;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                color: white;
-                border: 4px solid white;"
-            >10</div>
-             <!-- Enemy Health -->
-            <div style="
-                position: relative; 
-                width: 100%;
-                border-top: 4px solid white;
-                border-bottom: 4px solid white;
-                border-right: 4px solid white;"
-            >
-                <div style="background-color: red; height: 30px"></div>
-                <div 
-                    id="enemyHealth" 
-                    style="position: absolute; background: #818cf8; top: 0; right: 0; bottom: 0; left: 0;"
-                ></div>
-            </div>            
+            <div class="info-container">
+                Javascript Fighting game with HTML Canvas, adapted from <a href="https://www.youtube.com/watch?v=vyqbNFMDRGQ">this tutorial</a><br/>
+                Find the git repo and development log <a href="https://github.com/2-Greem/SimpleFightingGame">here</a><br/>
+                <br/>
+                <b>Oak Woods Assets:</b> <a href="https://brullov.itch.io/oak-woods" target="_blank" rel="noopener noreferrer">https://brullov.itch.io/oak-woods</a><br/>
+                <b>Fighter Asset #1:</b> <a href="https://luizmelo.itch.io/martial-hero" target="_blank" rel="noopener noreferrer">https://luizmelo.itch.io/martial-hero</a><br/>
+                <b>Fighter Asset #2:</b> <a href="https://luizmelo.itch.io/martial-hero-2" target="_blank" rel="noopener noreferrer">https://luizmelo.itch.io/martial-hero-2</a><br/>
+                <br/>
+                <b>Gameplay</b>
+                <p>
+
+                </p>
+                <h5>Player 1</h5>
+                <p>
+                    Use the <b>A</b> and <b>D</b> keys to move left and right, <b>W</b> to jump, and <b>Space</b> to attack.<br/>
+                    Player 1 has a longer blade with a slower swing, so time your swings wisely!
+                </p>
+                
+                <h5>Player 2</h5>
+                <p>
+                    Use the <b>&#8592;</b> and <b>&#8594;</b> arrow keys to move left and right, <b>&#8593;</b> to jump, and <b>&#8595;</b> to attack.<br/>
+                    Player 2 has a shorter blade that swings faster, so don't be afraid to rush in!
+                </p>
+
+
+            </div>
         </div>
-        <div 
-            id="displayText"
-            style="
-                position: absolute; 
-                color: white; 
-                display: none;
-                align-items: center;
-                justify-content: center;
-                top: 0;
-                right: 0;
-                bottom: 0;
-                left: 0;"
-        >Tie</div>
-        <canvas></canvas>
     </div>
+    
     <!-- GSAP -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js" integrity="sha512-H6cPm97FAsgIKmlBA4s774vqoN24V5gSQL4yBTDOY2su2DeXZVhQPxFK4P6GPdnZqM9fg1G3cMv5wD7e6cFLZQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="js/utils.js"></script>

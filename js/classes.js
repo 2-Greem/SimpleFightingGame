@@ -6,12 +6,12 @@ class Sprite {
         this.image = new Image();
         this.image.src = imageSrc;
         this.scale = scale;
-        this.framesMax = framesMax;
-        this.framesCurrent = 0;
-        this.framesElapsed = 0;
-        this.framesHold = 10;
+        this.framesMax = framesMax; // total amount of frames in an animation
+        this.framesCurrent = 0; // which frame of the animation we are on
+        this.framesElapsed = 0; // how many ticks have elapsed total?
+        this.framesHold = 10; // How many ticks of animation a frame is held for
         this.offset = offset;
-        this.animationLock = false;
+        this.animationLock = false; 
     }
 
     draw() {
@@ -94,13 +94,12 @@ class Fighter extends Sprite {
         }
     }
 
-    switchSprite(sprite){
+    switchSprite(sprite, ignoreDeadFlag = false){
         if (!this.sprites[sprite]) {
             console.error(`Sprite "${sprite}" does not exist.`);
             return;
         }
-        
-        if (this.image === this.sprites.death.image) {
+        if (this.image === this.sprites.death.image && !ignoreDeadFlag) {
                 if (this.framesCurrent == this.sprites.death.framesMax - 1) {
                 // Declare dead on final frame of death animation
                 this.isDead = true;
@@ -145,11 +144,20 @@ class Fighter extends Sprite {
         this.attackBox.position.x = this.position.x + this.attackBox.offset.x;
         this.attackBox.position.y = this.position.y + this.attackBox.offset.y;
         // c.fillRect(this.attackBox.position.x, this.attackBox.position.y, this.attackBox.width, this.attackBox.height);
-
+        
+        // X velocity
         const x = this.position.x + this.velocity.x;
-        if (x > 0 && x < 924){ // Ensure you cant move off the screen
+        // Ensure you cant move off the screen
+        if (x > 924){       // Right Bumper
+            this.position.x = 924;
+        } else if (x < 0){  // Left Bumper
+            this.position.x = 0;
+        } else {            // Normal Movement
             this.position.x += this.velocity.x;
         }
+        // Friction force applies regardless of movement
+        this.velocity.x = Math.trunc(this.velocity.x * friction);
+        // Y Velocity
         this.position.y += this.velocity.y;
         // Gravity
         if (this.position.y + this.height + this.velocity.y >= canvas.height - 96){
@@ -159,5 +167,20 @@ class Fighter extends Sprite {
         } else {
             this.velocity.y += gravity;
         }
+    }
+
+    reset(){
+        // Return to life
+        this.isDead = false;
+        this.health = 100;
+        this.animationLock = false;
+        this.switchSprite("idle", true)
+        // Cleanup Others
+        this.isAttacking = false;
+        this.framesCurrent = 0;
+        this.framesElapsed = 0;
+        this.framesHold = 5;
+        this.jumps = 2;
+        this.lastKeyPressed;
     }
 }
