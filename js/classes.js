@@ -238,8 +238,8 @@ class CpuBrain {
         canvasWidth, 
         minDecisionInterval = 50, 
         maxDecisionInterval = 80, 
-        minAttackInterval = 10,
-        maxAttackInterval = 50
+        minAttackInterval = 40,
+        maxAttackInterval = 100
     }){
         this.canvasHeight = canvasHeight;
         this.canvasWidth = canvasWidth;
@@ -250,7 +250,7 @@ class CpuBrain {
         this.decisionInterval = 0;
         this.minAttackInterval = minAttackInterval;
         this.maxAttackInterval = maxAttackInterval;
-        this.attackInterval = 0;
+        this.attackInterval = 60;
         this.attackIntervalTimer = 0;
     }
     setDecisionInterval(){
@@ -270,10 +270,10 @@ class CpuBrain {
         }
     }
     tickDecisionAttackTimer(){
-        this.attackInterval += 1;
+        this.attackIntervalTimer += 1;
         if (this.attackIntervalTimer >= this.attackInterval){
-            this.setAttackInterval();
             this.attackIntervalTimer = 0;
+            this.setAttackInterval();
         }
     }
     tickAllTimers(){

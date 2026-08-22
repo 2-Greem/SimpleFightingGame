@@ -9,7 +9,7 @@ c.fillRect(0, 0, canvas.width, canvas.height)
 
 const gravity = 0.5;
 const friction = 0.3;
-const timerMax = 60
+const timerMax = 120
 const isDebug = true; // debug mode adds the attack boxes
 let timer = timerMax;
 let timerId;
@@ -218,8 +218,14 @@ function animate(){
         } else {
             enemy.switchSprite("idle");
         }
+        // Y axis sprite movement is universal and overides all other movement
+        if (enemy.velocity.y < 0) {
+            enemy.switchSprite("jump");
+        } else if (enemy.velocity.y > 0) {
+            enemy.switchSprite("fall");
+        }
     } else if (!enemy.isDead && timer > 0){ // and implied ai is playing - // Enemy CPU movement
-        cpuPlayer.tickDecisionIntervalTimer();
+        cpuPlayer.tickAllTimers();
         if (Math.abs(enemy.position.x - cpuPlayer.targetLocation.x) < 20){
             // if its close enough, go idle and stop moving
             enemy.switchSprite("idle");
@@ -241,13 +247,18 @@ function animate(){
             enemy.jumps -= 1;
             enemy.velocity.y = -15;
         } 
-    }
         // Y axis sprite movement is universal and overides all other movement
         if (enemy.velocity.y < 0) {
             enemy.switchSprite("jump");
         } else if (enemy.velocity.y > 0) {
             enemy.switchSprite("fall");
         }
+        if (cpuPlayer.attackIntervalTimer == 0){
+            enemy.attack();
+        }
+    }
+
+    
 
     // Player Attack box collision
     if (player.isAttacking &&
