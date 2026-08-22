@@ -1,5 +1,5 @@
 class Sprite {
-    constructor({position, imageSrc, scale = 1, framesMax = 1, offset = {x: 0, y: 0}}) {
+    constructor({position, imageSrc, scale = 1, framesMax = 1, offset = {x: 0, y: 0}, flipX = false}) {
         this.position = position;
         this.height = 150;
         this.width = 50;
@@ -12,20 +12,40 @@ class Sprite {
         this.framesHold = 10; // How many ticks of animation a frame is held for
         this.offset = offset;
         this.animationLock = false; 
+        this.flipX = flipX;
     }
 
     draw() {
-        c.drawImage(
-            this.image, 
-            this.framesCurrent * (this.image.width / this.framesMax),
-            0,
-            this.image.width / this.framesMax,
-            this.image.height,
-            this.position.x - this.offset.x, 
-            this.position.y - this.offset.y,
-            this.image.width / this.framesMax * this.scale,
-            this.image.height / 1* this.scale
-        )
+        // This flips the coordinate system to draw the sprite? Weird but it works
+        c.save();
+        if (this.flipX) {
+            c.scale(-1, 1);
+
+            c.drawImage(
+                this.image,
+                this.framesCurrent * (this.image.width / this.framesMax),
+                0,
+                this.image.width / this.framesMax,
+                this.image.height,
+                -(this.position.x - this.offset.x) - (this.image.width / this.framesMax * this.scale),
+                this.position.y - this.offset.y,
+                this.image.width / this.framesMax * this.scale,
+                this.image.height * this.scale
+            );
+        } else {
+            c.drawImage(
+                this.image,
+                this.framesCurrent * (this.image.width / this.framesMax),
+                0,
+                this.image.width / this.framesMax,
+                this.image.height,
+                this.position.x - this.offset.x,
+                this.position.y - this.offset.y,
+                this.image.width / this.framesMax * this.scale,
+                this.image.height * this.scale
+            );
+        }
+        c.restore();
     }
 
     animateFrames(){
@@ -56,14 +76,16 @@ class Fighter extends Sprite {
         scale = 1, 
         framesMax = 1, 
         sprites,
-        attackBox = {offset: {}, width: undefined, height: undefined}
+        attackBox = {offset: {}, width: undefined, height: undefined},
+        flipX = false
     }) {
         super({
             position,
             imageSrc,
             scale,
             framesMax,
-            offset
+            offset,
+            flipX
         })
         this.velocity = velocity;
         this.height = 150;
@@ -87,6 +109,8 @@ class Fighter extends Sprite {
         this.isDead = false;
         this.sprites = sprites;
         this.jumps = 2;
+        this.defaultFlip = flipX;
+        this.defaultAttackBox = structuredClone(attackBox);
 
         for (const sprite in this.sprites){
             sprites[sprite].image = new Image();
@@ -137,13 +161,16 @@ class Fighter extends Sprite {
         this.animationLock = true;
     }
 
-    update(){
+    update(debug=false){
         this.draw()
         if (!this.isDead) this.animateFrames();
 
         this.attackBox.position.x = this.position.x + this.attackBox.offset.x;
         this.attackBox.position.y = this.position.y + this.attackBox.offset.y;
-        // c.fillRect(this.attackBox.position.x, this.attackBox.position.y, this.attackBox.width, this.attackBox.height);
+        if (debug){ // When debug it shows the attack boxes
+            c.fillRect(this.attackBox.position.x, this.attackBox.position.y, this.attackBox.width/2, this.attackBox.height/2);
+            c.fillRect(this.attackBox.position.x, this.attackBox.position.y, this.attackBox.width, this.attackBox.height);
+        }
         
         // X velocity
         const x = this.position.x + this.velocity.x;
@@ -166,6 +193,24 @@ class Fighter extends Sprite {
             this.jumps = 2;
         } else {
             this.velocity.y += gravity;
+        }
+    }
+
+    flip(flipDirection = !this.flipX){
+        // Slightly unintuitive
+        // Calling the function by itself flips the sprite
+        // Calling flipX(true) sets the sprite to its flipped state
+        // Calling flipX(false) sets the sprite to its unflipped state
+        if (flipDirection == this.flipX){
+            // If already flipped in the correct direction, do nothing
+            return
+        } else {
+            this.flipX = flipDirection;
+            if(this.flipX != this.defaultFlip){
+                this.attackBox.offset.x = -this.attackBox.width
+            } else {
+                this.attackBox.offset.x = this.defaultAttackBox.offset.x
+            }
         }
     }
 

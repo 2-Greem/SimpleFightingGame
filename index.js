@@ -8,8 +8,9 @@ canvas.height = 576;
 c.fillRect(0, 0, canvas.width, canvas.height)
 
 const gravity = 0.5;
-const friction = 0.6;
+const friction = 0.3;
 const timerMax = 60
+const isDebug = true; // debug mode adds the attack boxes
 let timer = timerMax;
 let timerId;
 
@@ -112,13 +113,16 @@ const enemy = new Fighter({
         },
         attackBox: {
             offset: {
-                x: -170,
+                x: 60,
                 y: -10
             },
             height: 150,
             width: 180
-    }
+        },
+        flipX: true
     });
+
+console.log(enemy.flipX);
 
 const keys = {
     a: {
@@ -160,6 +164,18 @@ function reset(){
     decreaseTimer()
 }
 
+function messyDirectionChecker(){
+    if (player.position.x > enemy.position.x){
+        // If P1 is on the right
+        player.flip(true);
+        enemy.flip(true);
+    } else {
+        // if P2 is on the right
+        player.flip(false);
+        enemy.flip(false);
+    }
+}
+
 // infinite loop
 function animate(){
     window.requestAnimationFrame(animate)
@@ -168,16 +184,17 @@ function animate(){
     shop.update();
     c.fillStyle = 'rgba(255, 255, 255, 0.15)'
     c.fillRect(0, 0, canvas.width, canvas.height);
-    player.update();
-    enemy.update();
+    messyDirectionChecker();
+    player.update(isDebug);
+    enemy.update(isDebug);
 
     // Player button movement
     // player.image = player.sprites.idle.image;
     if (keys.a.pressed && player.lastKeyPressed == 'a'){
-        player.velocity.x = -5;
+        player.velocity.x = -10;
         player.switchSprite("run");
     } else if (keys.d.pressed && player.lastKeyPressed == 'd'){
-        player.velocity.x = 5;
+        player.velocity.x = 10;
         player.switchSprite("run");
     } else {
         player.switchSprite("idle");
@@ -189,10 +206,10 @@ function animate(){
     }
     // Enemy button movement
     if (keys.ArrowLeft.pressed && enemy.lastKeyPressed == 'ArrowLeft'){
-        enemy.velocity.x = -5;
+        enemy.velocity.x = -10;
         enemy.switchSprite("run");
     } else if (keys.ArrowRight.pressed && enemy.lastKeyPressed == 'ArrowRight'){
-        enemy.velocity.x = 5;
+        enemy.velocity.x = 10;
         enemy.switchSprite("run");
     } else {
         enemy.switchSprite("idle");
@@ -252,6 +269,7 @@ function animate(){
 decreaseTimer()
 animate()
 
+
 // Pressed Keys Event Listeners
 
 window.addEventListener('keydown', (event) => {
@@ -260,6 +278,10 @@ window.addEventListener('keydown', (event) => {
     switch(event.key) {
         case 'r':
             reset();
+
+        case 'f':
+            player.flip();
+            enemy.flip();
     }
 
     if (!player.isDead && timer > 0){
