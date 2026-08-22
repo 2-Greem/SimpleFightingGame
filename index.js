@@ -13,6 +13,7 @@ const timerMax = 60
 const isDebug = true; // debug mode adds the attack boxes
 let timer = timerMax;
 let timerId;
+let isAIplaying = false;
 
 const background = new Sprite({
     position: { x: 0, y:0 },
@@ -122,7 +123,10 @@ const enemy = new Fighter({
         flipX: true
     });
 
-console.log(enemy.flipX);
+const cpuPlayer = new CpuBrain({
+    canvasHeight: canvas.height, 
+    canvasWidth: canvas.width
+});
 
 const keys = {
     a: {
@@ -189,7 +193,6 @@ function animate(){
     enemy.update(isDebug);
 
     // Player button movement
-    // player.image = player.sprites.idle.image;
     if (keys.a.pressed && player.lastKeyPressed == 'a'){
         player.velocity.x = -10;
         player.switchSprite("run");
@@ -205,20 +208,46 @@ function animate(){
         player.switchSprite("fall");
     }
     // Enemy button movement
-    if (keys.ArrowLeft.pressed && enemy.lastKeyPressed == 'ArrowLeft'){
-        enemy.velocity.x = -10;
-        enemy.switchSprite("run");
-    } else if (keys.ArrowRight.pressed && enemy.lastKeyPressed == 'ArrowRight'){
-        enemy.velocity.x = 10;
-        enemy.switchSprite("run");
-    } else {
-        enemy.switchSprite("idle");
+    if (!isAIplaying){
+        if (keys.ArrowLeft.pressed && enemy.lastKeyPressed == 'ArrowLeft'){
+            enemy.velocity.x = -10;
+            enemy.switchSprite("run");
+        } else if (keys.ArrowRight.pressed && enemy.lastKeyPressed == 'ArrowRight'){
+            enemy.velocity.x = 10;
+            enemy.switchSprite("run");
+        } else {
+            enemy.switchSprite("idle");
+        }
+    } else if (!enemy.isDead && timer > 0){ // and implied ai is playing - // Enemy CPU movement
+        cpuPlayer.tickDecisionIntervalTimer();
+        if (Math.abs(enemy.position.x - cpuPlayer.targetLocation.x) < 20){
+            // if its close enough, go idle and stop moving
+            enemy.switchSprite("idle");
+        } else if (enemy.position.x > cpuPlayer.targetLocation.x){
+            enemy.velocity.x = -10;
+            enemy.switchSprite("run");
+        } else if (enemy.position.x < cpuPlayer.targetLocation.x){
+            enemy.velocity.x = 10;
+            enemy.switchSprite("run");
+        }
+        // Why does the below commented block break the movement of the cpu?
+
+        // if (enemy.velocity.x = 0){
+        //     enemy.switchSprite("run");
+        // }
+
+        // Cpu y axis movement logic
+        if (enemy.jumps > 0 && cpuPlayer.targetLocation.y > enemy.position.y) {
+            enemy.jumps -= 1;
+            enemy.velocity.y = -15;
+        } 
     }
-    if (enemy.velocity.y < 0) {
-        enemy.switchSprite("jump");
-    } else if (enemy.velocity.y > 0) {
-        enemy.switchSprite("fall");
-    }
+        // Y axis sprite movement is universal and overides all other movement
+        if (enemy.velocity.y < 0) {
+            enemy.switchSprite("jump");
+        } else if (enemy.velocity.y > 0) {
+            enemy.switchSprite("fall");
+        }
 
     // Player Attack box collision
     if (player.isAttacking &&
@@ -277,11 +306,13 @@ window.addEventListener('keydown', (event) => {
     // occurs regardless of player deaths
     switch(event.key) {
         case 'r':
+            isAIplaying = false;
             reset();
-
-        case 'f':
-            player.flip();
-            enemy.flip();
+            break;
+        case 't':
+            isAIplaying = true;
+            reset();
+            break;
     }
 
     if (!player.isDead && timer > 0){
@@ -305,7 +336,7 @@ window.addEventListener('keydown', (event) => {
                 break;
         }
     }
-    if (!enemy.isDead && timer > 0){
+    if (!enemy.isDead && timer > 0 && !isAIplaying){
         switch(event.key) {
             // Enemy Controls
             case 'ArrowRight':
@@ -337,13 +368,17 @@ window.addEventListener('keyup', (event) => {
         case 'a':
             keys.a.pressed = false
             break
-        // Enemy Controls
-        case 'ArrowRight':
-            keys.ArrowRight.pressed = false;
-            break;
-        case 'ArrowLeft':
-            keys.ArrowLeft.pressed = false;
-            break
+    }
+    // Enemy Controls
+    if (!isAIplaying){
+        switch (event.key){
+            case 'ArrowRight':
+                keys.ArrowRight.pressed = false;
+                break;
+            case 'ArrowLeft':
+                keys.ArrowLeft.pressed = false;
+                break
+        }
     }
 })
 

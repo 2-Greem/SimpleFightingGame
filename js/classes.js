@@ -1,3 +1,5 @@
+const FLOOR_HEIGHT = 330;
+
 class Sprite {
     constructor({position, imageSrc, scale = 1, framesMax = 1, offset = {x: 0, y: 0}, flipX = false}) {
         this.position = position;
@@ -189,7 +191,7 @@ class Fighter extends Sprite {
         // Gravity
         if (this.position.y + this.height + this.velocity.y >= canvas.height - 96){
             this.velocity.y = 0;
-            this.position.y = 330;
+            this.position.y = FLOOR_HEIGHT;
             this.jumps = 2;
         } else {
             this.velocity.y += gravity;
@@ -227,5 +229,61 @@ class Fighter extends Sprite {
         this.framesHold = 5;
         this.jumps = 2;
         this.lastKeyPressed;
+    }
+}
+
+class CpuBrain {
+    constructor({
+        canvasHeight, 
+        canvasWidth, 
+        minDecisionInterval = 50, 
+        maxDecisionInterval = 80, 
+        minAttackInterval = 10,
+        maxAttackInterval = 50
+    }){
+        this.canvasHeight = canvasHeight;
+        this.canvasWidth = canvasWidth;
+        this.targetLocation = {x: 0, y: 0};
+        this.minDecisionInterval = minDecisionInterval;
+        this.maxDecisionInterval = maxDecisionInterval;
+        this.decisionIntervalTimer = 0;
+        this.decisionInterval = 0;
+        this.minAttackInterval = minAttackInterval;
+        this.maxAttackInterval = maxAttackInterval;
+        this.attackInterval = 0;
+        this.attackIntervalTimer = 0;
+    }
+    setDecisionInterval(){
+        this.decisionInterval = Math.random() * (this.maxDecisionInterval - this.minDecisionInterval) + this.minDecisionInterval;
+    }
+    setAttackInterval(){
+        this.attackInterval = Math.random() * (this.maxAttackInterval - this.minAttackInterval) + this.minAttackInterval;
+    }
+    tickDecisionIntervalTimer(){
+        this.decisionIntervalTimer += 1;
+        // Change target Location and reset timer
+        if (this.decisionIntervalTimer >= this.decisionInterval){
+            this.changeTargetLocation();
+            this.setDecisionInterval();
+            this.decisionIntervalTimer = 0;
+            console.log(`Changed Target Location to X: ${this.targetLocation.x}, Y: ${this.targetLocation.y}`)
+        }
+    }
+    tickDecisionAttackTimer(){
+        this.attackInterval += 1;
+        if (this.attackIntervalTimer >= this.attackInterval){
+            this.setAttackInterval();
+            this.attackIntervalTimer = 0;
+        }
+    }
+    tickAllTimers(){
+        this.tickDecisionAttackTimer();
+        this.tickDecisionIntervalTimer();
+    }
+    changeTargetLocation(){
+        this.targetLocation = { 
+            x: Math.random() * (this.canvasWidth - 0) + 0,
+            y: Math.random() * (this.canvasHeight + this.canvasHeight) - this.canvasHeight
+        }
     }
 }
