@@ -120,16 +120,22 @@ class Fighter extends Sprite {
         }
     }
 
+    animateFrames(){
+        // If not dead, animate frames
+        if (!this.isDead) super.animateFrames();
+        // If in the dying animation, ensure that the isDead attribute is updated on final frame
+        if (this.image === this.sprites.death.image && this.framesCurrent == this.sprites.death.framesMax - 1) {
+            this.isDead = true;
+        }
+    }
+
     switchSprite(sprite, ignoreDeadFlag = false){
         if (!this.sprites[sprite]) {
             console.error(`Sprite "${sprite}" does not exist.`);
             return;
         }
+        // Check if in the death animation, ignore this condition if ignoreDeadFlag is true.
         if (this.image === this.sprites.death.image && !ignoreDeadFlag) {
-                if (this.framesCurrent == this.sprites.death.framesMax - 1) {
-                // Declare dead on final frame of death animation
-                this.isDead = true;
-            }
             // Can't change animation on the death animation
             return
         }
@@ -165,7 +171,7 @@ class Fighter extends Sprite {
 
     update(debug=false){
         this.draw()
-        if (!this.isDead) this.animateFrames();
+        this.animateFrames();
 
         this.attackBox.position.x = this.position.x + this.attackBox.offset.x;
         this.attackBox.position.y = this.position.y + this.attackBox.offset.y;

@@ -1,3 +1,5 @@
+let toggleTimerId;
+
 function rectangularCollision({
     rectangle1: rectangle1,
     rectangle2: rectangle2
@@ -20,6 +22,21 @@ function determineWinner({player, enemy, timerId}){
     } else if ( player.health < enemy.health) {
         document.querySelector("#displayText").innerHTML = 'Player 2 Wins';
     }
+}
+
+function clearCpuToggle(){
+    document.querySelector("#displayCpuToggle").style.display = 'none'
+}
+
+function displayCpuToggle(toggleState){
+    clearTimeout(toggleTimerId);
+    document.querySelector("#displayCpuToggle").style.display = 'block';
+    if (toggleState) { // CPU has been selected
+        document.querySelector("#displayCpuToggle").innerHTML = 'CPU opponent queued for next game';
+    } else { // Player has been selected
+        document.querySelector("#displayCpuToggle").innerHTML = 'Local opponent queued for next game';
+    }
+    toggleTimerId = setTimeout(clearCpuToggle, 1000)
 }
 
 function decreaseTimer(){

@@ -10,10 +10,11 @@ c.fillRect(0, 0, canvas.width, canvas.height)
 const gravity = 0.5;
 const friction = 0.3;
 const timerMax = 120
-const isDebug = true; // debug mode adds the attack boxes
+const isDebug = false; // debug mode adds the attack boxes
 let timer = timerMax;
 let timerId;
 let isAIplaying = false;
+let nextGameAiPlayer = false;
 
 const background = new Sprite({
     position: { x: 0, y:0 },
@@ -144,7 +145,7 @@ const keys = {
 
 }
 
-function reset(){
+function reset(activateAiPlayer = true){
     // Player 1 Stat Reset
     player.reset();
     player.position = { x: 200, y: 100 };
@@ -163,6 +164,10 @@ function reset(){
         })
     // Clear Winner Declaration
     document.querySelector("#displayText").style.display = 'none';
+
+    // Activate CPU or Player
+    isAIplaying = activateAiPlayer;
+
     // Restart Timer
     timer = timerMax;
     decreaseTimer()
@@ -317,12 +322,12 @@ window.addEventListener('keydown', (event) => {
     // occurs regardless of player deaths
     switch(event.key) {
         case 'r':
-            isAIplaying = false;
-            reset();
+            reset(nextGameAiPlayer);
             break;
         case 't':
-            isAIplaying = true;
-            reset();
+            // Toggles wether the AI or Player will be in control next round
+            nextGameAiPlayer = !nextGameAiPlayer
+            displayCpuToggle(nextGameAiPlayer);
             break;
     }
 
