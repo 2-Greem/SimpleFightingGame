@@ -229,37 +229,47 @@ function animate(){
         } else if (enemy.velocity.y > 0) {
             enemy.switchSprite("fall");
         }
-    } else if (!enemy.isDead && timer > 0){ // and implied ai is playing - // Enemy CPU movement
-        cpuPlayer.tickAllTimers();
-        if (Math.abs(enemy.position.x - cpuPlayer.targetLocation.x) < 20){
-            // if its close enough, go idle and stop moving
-            enemy.switchSprite("idle");
-        } else if (enemy.position.x > cpuPlayer.targetLocation.x){
-            enemy.velocity.x = -10;
-            enemy.switchSprite("run");
-        } else if (enemy.position.x < cpuPlayer.targetLocation.x){
-            enemy.velocity.x = 10;
-            enemy.switchSprite("run");
+    } else if (!enemy.isDead){ // and implied ai is playing - // Enemy CPU movement
+        // Top to bottom is animation Priority, with top being lowest
+        // Active Movements - Timer > 0
+        if (timer > 0) {
+            cpuPlayer.tickAllTimers();
+            if (Math.abs(enemy.position.x - cpuPlayer.targetLocation.x) < 20){
+                // if its close enough, go idle and stop moving
+                enemy.switchSprite("idle");
+            } else if (enemy.position.x > cpuPlayer.targetLocation.x){
+                enemy.velocity.x = -10;
+                enemy.switchSprite("run");
+            } else if (enemy.position.x < cpuPlayer.targetLocation.x){
+                enemy.velocity.x = 10;
+                enemy.switchSprite("run");
+            }
+
+            // Cpu jump logic
+            if (enemy.jumps > 0 && cpuPlayer.targetLocation.y > enemy.position.y) {
+                enemy.jumps -= 1;
+                enemy.velocity.y = -15;
+            } 
         }
-        // Why does the below commented block break the movement of the cpu?
+        // Passive Movements - Occur Regardless of timer
 
-        // if (enemy.velocity.x = 0){
-        //     enemy.switchSprite("run");
-        // }
-
-        // Cpu y axis movement logic
-        if (enemy.jumps > 0 && cpuPlayer.targetLocation.y > enemy.position.y) {
-            enemy.jumps -= 1;
-            enemy.velocity.y = -15;
-        } 
         // Y axis sprite movement is universal and overides all other movement
         if (enemy.velocity.y < 0) {
             enemy.switchSprite("jump");
         } else if (enemy.velocity.y > 0) {
             enemy.switchSprite("fall");
         }
-        if (cpuPlayer.attackIntervalTimer == 0){
-            enemy.attack();
+
+        // Active Movement - Only attack if in time
+        if (timer > 0) {
+            if (cpuPlayer.attackIntervalTimer == 0){
+                enemy.attack();
+            }
+        }
+
+        // Sets to idle when match ends
+        if (player.health <= 0) {
+            enemy.switchSprite("idle");
         }
     }
 
