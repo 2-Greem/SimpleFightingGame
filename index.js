@@ -28,101 +28,12 @@ const shop = new Sprite({
     framesMax: 6
 })
 
-const player = new Fighter({
-    position: { x: 200, y: 100 },
-    velocity: { x: 0, y: 0 },
-    imageSrc: './img/Martial Hero/Sprites/Idle.png',
-    framesMax: 8,
-    scale: 2.5,
-    offset: { x: 215, y: 157},
-    sprites: {
-        idle: {
-            imageSrc: './img/Martial Hero/Sprites/Idle.png',
-            framesMax: 8,
-        },
-        run: {
-            imageSrc: './img/Martial Hero/Sprites/Run.png',
-            framesMax: 8,
-        },
-        jump: {
-            imageSrc: './img/Martial Hero/Sprites/Jump.png',
-            framesMax: 2,
-        },
-        fall: {
-            imageSrc: './img/Martial Hero/Sprites/Fall.png',
-            framesMax: 2,
-        },
-        attack: {
-            imageSrc: './img/Martial Hero/Sprites/Attack1.png',
-            framesMax: 6,
-        },
-        takeHit: {
-            imageSrc: './img/Martial Hero/Sprites/TakeHit.png',
-            framesMax: 4,
-        },
-        death: {
-            imageSrc: './img/Martial Hero/Sprites/Death.png',
-            framesMax: 6,
-        }
-    },
-    attackBox: {
-        offset: {
-            x: 60,
-            y: -20
-        },
-        height: 160,
-        width: 190
-    }
-});
-
-const enemy = new Fighter({
-        position: { x: 800, y: 100 },
-        velocity: { x: 0, y: 0 },
-        imageSrc: './img/Martial Hero 2/Sprites/Idle.png',
-        framesMax: 4,
-        scale: 2.5,
-        color: 'blue' ,
-        offset: { x: 215, y: 170 },
-        sprites: {
-            idle: {
-                imageSrc: './img/Martial Hero 2/Sprites/Idle.png',
-                framesMax: 4,
-            },
-            run: {
-                imageSrc: './img/Martial Hero 2/Sprites/Run.png',
-                framesMax: 8,
-            },
-            jump: {
-                imageSrc: './img/Martial Hero 2/Sprites/Jump.png',
-                framesMax: 2,
-            },
-            fall: {
-                imageSrc: './img/Martial Hero 2/Sprites/Fall.png',
-                framesMax: 2,
-            },
-            attack: {
-                imageSrc: './img/Martial Hero 2/Sprites/Attack1.png',
-                framesMax: 4,
-            },
-            takeHit: {
-                imageSrc: './img/Martial Hero 2/Sprites/TakeHit.png',
-                framesMax: 3,
-            },
-            death: {
-                imageSrc: './img/Martial Hero 2/Sprites/Death.png',
-                framesMax: 7,
-            }
-        },
-        attackBox: {
-            offset: {
-                x: 60,
-                y: -10
-            },
-            height: 150,
-            width: 180
-        },
-        flipX: true
-    });
+// Intialise Players
+const player = MartialHero1;
+const enemy = MartialHero2;
+// Place players in location according to role
+player.position = { x: 200, y: 100 }
+enemy.position = { x: 800, y: 100 }
 
 const cpuPlayer = new CpuBrain({
     canvasHeight: canvas.height, 
@@ -177,11 +88,11 @@ function messyDirectionChecker(){
     if (player.position.x > enemy.position.x){
         // If P1 is on the right
         player.flip(true);
-        enemy.flip(true);
+        enemy.flip(false);
     } else {
         // if P2 is on the right
         player.flip(false);
-        enemy.flip(false);
+        enemy.flip(true);
     }
 }
 
@@ -281,7 +192,7 @@ function animate(){
             rectangle1: player,
             rectangle2: enemy
         }) &&
-        player.framesCurrent === 4
+        player.framesCurrent === player.sprites["attack"].framesMax - 1 // second last frame of attack
     ){
         enemy.takeHit()
         player.isAttacking = false; // only hit once
@@ -301,7 +212,7 @@ function animate(){
             rectangle1: enemy,
             rectangle2: player
         }) &&
-        enemy.framesCurrent === 2
+        enemy.framesCurrent === enemy.sprites["attack"].framesMax - 1 // second last frame of attack
     ){
         player.takeHit();
         enemy.isAttacking = false; // only hit once
@@ -357,7 +268,7 @@ window.addEventListener('keydown', (event) => {
                     player.velocity.y = -15;
                 }                
                 break;
-            case ' ':
+            case 's':
                 player.attack();
                 break;
         }

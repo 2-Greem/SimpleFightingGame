@@ -18,7 +18,7 @@ class Sprite {
     }
 
     draw() {
-        // This flips the coordinate system to draw the sprite? Weird but it works
+        // This flips the coordinate system to draw the sprite
         c.save();
         if (this.flipX) {
             c.scale(-1, 1);
@@ -79,7 +79,8 @@ class Fighter extends Sprite {
         framesMax = 1, 
         sprites,
         attackBox = {offset: {}, width: undefined, height: undefined},
-        flipX = false
+        flipX = false,
+        spriteWidth = 0
     }) {
         super({
             position,
@@ -118,6 +119,7 @@ class Fighter extends Sprite {
             sprites[sprite].image = new Image();
             sprites[sprite].image.src = sprites[sprite].imageSrc;
         }
+        this.spriteWidth = spriteWidth // weird sprite X axis rotation workaround for non-centered sprites
     }
 
     animateFrames(){
@@ -151,7 +153,6 @@ class Fighter extends Sprite {
     }
 
     attack(){
-        // 100 millisecond attack
         this.isAttacking = true;
         this.switchSprite("attack")
         this.animationLock = true;
@@ -176,8 +177,24 @@ class Fighter extends Sprite {
         this.attackBox.position.x = this.position.x + this.attackBox.offset.x;
         this.attackBox.position.y = this.position.y + this.attackBox.offset.y;
         if (debug){ // When debug it shows the attack boxes
-            c.fillRect(this.attackBox.position.x, this.attackBox.position.y, this.attackBox.width/2, this.attackBox.height/2);
+            c.fillStyle = 'black';
+            c.fillRect(this.attackBox.position.x, this.attackBox.position.y, 10, 10);
+            c.fillStyle = 'rgba(255, 255, 255, 0.15)';
             c.fillRect(this.attackBox.position.x, this.attackBox.position.y, this.attackBox.width, this.attackBox.height);
+            // Player Sprite Bounds
+            c.fillStyle = this.colour;
+            c.fillRect(
+                this.position.x - this.offset.x,
+                this.position.y - this.offset.y + (this.image.height * this.scale / 2),
+                this.image.width / this.framesMax * this.scale + 20,
+                2
+            );
+            c.fillRect(
+                this.position.x - this.offset.x + 250,
+                this.position.y - this.offset.y,
+                2,
+                this.image.height / this.framesMax * this.scale + 20,
+            );
         }
         
         // X velocity
@@ -215,7 +232,7 @@ class Fighter extends Sprite {
         } else {
             this.flipX = flipDirection;
             if(this.flipX != this.defaultFlip){
-                this.attackBox.offset.x = -this.attackBox.width
+                this.attackBox.offset.x = -this.attackBox.width - this.spriteWidth
             } else {
                 this.attackBox.offset.x = this.defaultAttackBox.offset.x
             }
